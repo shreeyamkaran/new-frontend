@@ -3,9 +3,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Moon, Sun } from "lucide-react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
-import { setUser } from "@/redux/userSlice";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -21,7 +19,6 @@ export default function Login() {
 
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleLogin = async () => {
@@ -37,9 +34,13 @@ export default function Login() {
             const token = await response.text();
             const decodedToken = jwtDecode(token);
             console.log(decodedToken);
-            dispatch(setUser({ user: decodedToken, token }));
-            navigate("/");
-            
+            localStorage.setItem("jwt", token);
+            if(decodedToken.role == "ROLE_Admin") {
+                navigate("/admin");
+            }
+            else {
+                navigate("/");
+            }
         }
         catch(error) {
             console.log(error);

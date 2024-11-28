@@ -3,11 +3,11 @@ import { Button } from "../ui/button";
 import { useTheme } from "@/utils/theme-provider";
 import { Moon, Sun, Settings, Bell, ClipboardCheck, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { jwtDecode } from "jwt-decode";
 
 export default function Navbar() {
-    const user = useSelector((state: RootState) => state.user.user);
+    const token = localStorage.getItem("jwt");
+    const user = jwtDecode(token? token : "");
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const toggleTheme = () => {
@@ -21,7 +21,8 @@ export default function Navbar() {
     return (
         <div className="sticky z-10 top-0 backdrop-blur-lg flex justify-between items-center px-4 sm:px-20 py-2">
             {
-                user?.role == "ROLE_Admin" ? (
+                token &&
+                user.role == "ROLE_Admin" ? (
                     <div className="text-xl sm:text-4xl">
                         brand name
                     </div>
@@ -34,11 +35,13 @@ export default function Navbar() {
 
             <div className="flex items-center gap-4">
                 {
-                    user?.role != "ROLE_Admin" &&
+                    token &&
+                    user.role != "ROLE_Admin" &&
                     <Button variant="outline" size="sm" onClick={ () => navigate("/tasks") }><ClipboardCheck /></Button>
                 }
                 {
-                    user?.role == "ROLE_Manager" &&
+                    token &&
+                    user.role == "ROLE_Manager" &&
                     <Button variant="outline" size="sm" onClick={ () => navigate("/manage") }><Settings /></Button>
                 }
                 <Sheet>

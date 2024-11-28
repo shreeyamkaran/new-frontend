@@ -1,37 +1,43 @@
-import { RootState } from "@/redux/store";
 import { Fragment, ReactNode } from "react";
-import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import Unauthorised from "../pages/unauthorised";
 
 interface ProtectedRouteProps {
     children: ReactNode;
     requiredRole?: string;
+    disallowedRole?: string; // Add this prop to check for disallowed roles
 }
 
 interface MyToken {
-    sub: string,
-    role: string,
-    iat: number,
-    exp: number
+    sub: string;
+    role: string;
+    iat: number;
+    exp: number;
 }
 
-export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-    const token = useSelector((state: RootState) => state.user.token);
+export default function ProtectedRoute({ children, requiredRole, disallowedRole }: ProtectedRouteProps) {
+    const token = localStorage.getItem("jwt");
+    const location = useLocation();
 
     if(!token) {
         return <Navigate to="/login" />
     }
     
+
     const decodedToken = jwtDecode<MyToken>(token);
     const userRole = decodedToken.role;
 
-    if (requiredRole && userRole !== requiredRole) {
-        // If a required role is set and the user doesn't have the correct role, redirect
-        return <Navigate to="/" />;
+    // If the route has a disallowed role and the user's role matches, redirect
+    if (disallowedRole && userRole === disallowedRole) {
+        return <Unauthorised />;  // Redirect to home or any other page
     }
 
-    // If the token is valid and the user has the right role, render the protected route
-    return <Fragment>{children}</Fragment>;
+    // If a required role is set and the user doesn't have the correct role, redirect
+    if (requiredRole && userRole !== requiredRole) {
+        return <Unauthorised />;
+    }
 
+    // If the token is valid and no disallowed role is matched, render the protected route
+    return <Fragment>{children}</Fragment>;
 }

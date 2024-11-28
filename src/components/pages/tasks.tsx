@@ -44,7 +44,9 @@ export default function Tasks() {
             duration: convertHHMMToMinutes(duration),
             appraisalStatus: checked ? "PENDING" : "DID_NOT_APPLY",
             projectId: Number(projectString.split(':')[0]),
-            projectName: projectString.split(':')[1]
+            projectName: projectString.split(':')[1],
+            numberOfRatings: 0,
+            ratings: 0.0
         }
 
         try {

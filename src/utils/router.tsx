@@ -10,7 +10,7 @@ const router = createBrowserRouter([
     {
         path: "/",
         element: (
-            <ProtectedRoute>
+            <ProtectedRoute disallowedRole="ROLE_Admin">
                 <Home />
             </ProtectedRoute>
         )
@@ -18,7 +18,7 @@ const router = createBrowserRouter([
     {
         path: "/tasks",
         element: (
-            <ProtectedRoute>
+            <ProtectedRoute disallowedRole="ROLE_Admin">
                 <Tasks />
             </ProtectedRoute>
         )
@@ -41,7 +41,9 @@ const router = createBrowserRouter([
     },
     {
         path: "/login",
-        element: <Login />
+        element: (
+            <Login />
+        )
     }
 ]);
 
